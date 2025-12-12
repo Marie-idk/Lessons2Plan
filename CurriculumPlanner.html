@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gabriel's Curriculum Planner</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PDF Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -29,7 +26,6 @@
             
             --radius: 20px;
             --shadow: 0 10px 20px rgba(0,0,0,0.08);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * { box-sizing: border-box; outline: none; }
@@ -77,18 +73,18 @@
 
         h1 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             margin: 0;
-            color: #333;
-            letter-spacing: 0.5px;
-        }
-
-        h1 span {
-            background: linear-gradient(45deg, #FF6B6B, #9D50BB);
+            /* Bright Rainbow Gradient */
+            background: linear-gradient(45deg, #FF6B6B, #FF9F1C, #4ECDC4, #00C2FF, #9D50BB);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
         }
+
+        /* Removed specific span styling to make the whole title colorful */
 
         .header-actions { display: flex; gap: 12px; }
 
@@ -104,7 +100,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.95rem;
-            transition: var(--transition);
+            transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(50,50,93,0.11);
         }
 
@@ -134,7 +130,7 @@
             white-space: nowrap;
             cursor: pointer;
             color: var(--text-light);
-            transition: var(--transition);
+            transition: all 0.3s;
         }
 
         .filter-pill:hover { transform: translateY(-2px); }
@@ -150,7 +146,7 @@
         /* Grid Layout */
         .curriculum-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 25px;
             padding-bottom: 20px;
         }
@@ -162,7 +158,7 @@
             padding: 20px;
             border: 1px solid #f0f0f0;
             box-shadow: var(--shadow);
-            transition: var(--transition);
+            transition: all 0.3s;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -197,9 +193,17 @@
         .lessons-preview { margin-top: auto; border-top: 1px solid #eee; padding-top: 10px; }
         .lessons-preview h5 { margin: 0 0 8px 0; font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
         .lesson-item-preview {
-            display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #444; padding: 4px 8px; background: #f9f9f9; border-radius: 6px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 6px; color: #444; padding: 4px 8px; background: #f9f9f9; border-radius: 6px;
         }
+        .lesson-item-preview.done { background: #e8f5e9; color: #2ecc71; text-decoration: line-through; opacity: 0.8; }
         .lesson-date-badge { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: #666; margin-right: 8px; }
+
+        .has-notes-badge { 
+            color: #3498db; margin-left: 5px; font-size: 0.9rem; display: none;
+        }
+        .has-notes-badge.visible { display: inline; }
+        .check-badge { color: #2ecc71; margin-right: 5px; display: none; }
+        .lesson-item-preview.done .check-badge { display: inline; }
 
         .card-footer {
             margin-top: 15px; padding-top: 10px; border-top: 1px solid #f5f5f5;
@@ -219,6 +223,7 @@
             align-items: center; justify-content: center;
         }
         .modal.active { display: flex; }
+        .modal.nested { z-index: 1100; background: rgba(0,0,0,0.3); }
         
         .modal-card {
             background: white; width: 95%; max-width: 600px; border-radius: var(--radius); padding: 30px;
@@ -235,10 +240,23 @@
         input:focus, select:focus, textarea:focus { border-color: #a777e3; background: white; }
         
         /* Dynamic Lesson Rows */
-        .lesson-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-        .lesson-row input { flex: 1; }
-        .lesson-row input[type="date"] { width: 140px; flex: none; }
-        .btn-remove-lesson { color: #ff6b6b; background: none; border: none; cursor: pointer; font-size: 1.2rem; }
+        .lesson-row { 
+            display: flex; gap: 8px; margin-bottom: 10px; align-items: center; 
+            background: white; padding: 8px; border-radius: 8px; border: 1px solid #eee;
+        }
+        .lesson-row input { flex: 1; border: none; background: transparent; padding: 5px; }
+        .lesson-row input:focus { box-shadow: none; border-bottom: 2px solid #a777e3; border-radius: 0; }
+        .lesson-row input[type="date"] { width: 130px; flex: none; font-size: 0.85rem; }
+        
+        .btn-icon-action { 
+            color: #95a5a6; background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 5px; border-radius: 4px; 
+        }
+        .btn-icon-action:hover { background: #f0f0f0; color: #333; }
+        .btn-icon-action.has-content { color: #3498db; }
+        .btn-icon-action.delete { color: #ff6b6b; }
+        .btn-icon-action.done-check { color: #e0e0e0; }
+        .btn-icon-action.done-check.active { color: #2ecc71; background: #e8f5e9; }
+        
         .btn-add-lesson { background: #eef2f7; color: #555; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
         .btn-add-lesson:hover { background: #dfe4ea; }
 
@@ -252,7 +270,7 @@
         @media (max-width: 600px) {
             header { flex-direction: column; align-items: flex-start; gap: 15px; }
             .curriculum-grid { grid-template-columns: 1fr; }
-            .lesson-row { flex-wrap: wrap; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+            .lesson-row { flex-wrap: wrap; }
             .lesson-row input[type="date"] { width: 100%; }
         }
     </style>
@@ -264,8 +282,8 @@
 
     <header>
         <div>
-            <h1><span>Gabriel's</span> Curriculum</h1>
-            <div style="font-size: 0.9rem; color: #888; font-weight: 600;">Planner & Strategy Board</div>
+            <h1>Gabriel's Curriculum</h1>
+            <div style="font-size: 0.95rem; color: #555; font-weight: 700; margin-top: 4px;">Planner & Taught Record</div>
         </div>
         <div class="header-actions">
             <button class="btn btn-add" onclick="window.openModal()">
@@ -290,7 +308,7 @@
     <div class="curriculum-grid" id="grid-content"></div>
 </div>
 
-<!-- Modal -->
+<!-- Main Plan Modal -->
 <div id="plan-modal" class="modal">
     <div class="modal-card">
         <button onclick="window.closeModal()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #aaa;">&times;</button>
@@ -328,13 +346,15 @@
             </div>
 
             <div class="form-group">
-                <label style="color: #d35400;"><i class="fas fa-lightbulb"></i> Teaching Strategy</label>
-                <textarea id="inp-strategy" rows="2" placeholder="Specific sensory cues or literal steps..."></textarea>
+                <label style="color: #d35400;"><i class="fas fa-lightbulb"></i> Teaching Strategy (General)</label>
+                <textarea id="inp-strategy" rows="2" placeholder="General sensory cues or accommodations..."></textarea>
             </div>
 
             <!-- Lessons Section -->
             <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                <label style="color: #2c3e50; margin-bottom: 10px;">Individual Lessons (Target Dates)</label>
+                <label style="color: #2c3e50; margin-bottom: 10px;">Individual Lessons & Scripts</label>
+                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Use the checkmark <i class="fas fa-check"></i> to mark a lesson as Taught.</div>
+                
                 <div id="lessons-container">
                     <!-- Dynamic Rows go here -->
                 </div>
@@ -353,6 +373,19 @@
 
             <button type="submit" class="btn-submit" id="btn-save">Save Plan</button>
         </form>
+    </div>
+</div>
+
+<!-- Details/Script Modal (Nested) -->
+<div id="script-modal" class="modal nested">
+    <div class="modal-card" style="max-width: 450px;">
+        <h3 style="margin-top: 0; font-family: 'Fredoka', sans-serif;">Lesson Details & Script</h3>
+        <p style="font-size: 0.85rem; color: #666;">Write the concrete, sequential steps or literal instructions for Gabriel here.</p>
+        <textarea id="inp-lesson-details" rows="12" style="width: 100%; resize: vertical;" placeholder="1. Step one...&#10;2. Step two..."></textarea>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn-submit" onclick="window.saveScript()" style="margin-top:0; background: #3498db;">Save Script</button>
+            <button class="btn-submit" onclick="window.closeScriptModal()" style="margin-top:0; background: #eee; color: #555;">Cancel</button>
+        </div>
     </div>
 </div>
 
@@ -377,6 +410,7 @@
 
     let plans = [];
     let activeFilter = 'All';
+    let currentScriptTarget = null; 
 
     const subjectColors = {
         'Math': 'var(--math-color)',
@@ -439,9 +473,16 @@
                 lessonsHtml = `<div class="lessons-preview"><h5>Planned Lessons</h5>`;
                 item.lessons.forEach(l => {
                     let dateDisplay = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : '-';
+                    let detailsBadge = (l.details && l.details.trim().length > 0) ? `<i class="fas fa-file-alt has-notes-badge visible" title="Has script"></i>` : '';
+                    let completedClass = l.completed ? 'done' : '';
+                    
                     lessonsHtml += `
-                        <div class="lesson-item-preview">
-                            <span><span class="lesson-date-badge">${dateDisplay}</span> ${l.name}</span>
+                        <div class="lesson-item-preview ${completedClass}">
+                            <span>
+                                <i class="fas fa-check-circle check-badge"></i>
+                                <span class="lesson-date-badge">${dateDisplay}</span> ${l.name}
+                            </span>
+                            ${detailsBadge}
                         </div>`;
                 });
                 lessonsHtml += `</div>`;
@@ -478,24 +519,73 @@
     }
 
     // --- MODAL FUNCTIONS ---
-    window.addLessonRow = function(name = '', date = '') {
+    window.addLessonRow = function(name = '', date = '', details = '', completed = false) {
         const container = document.getElementById('lessons-container');
         const div = document.createElement('div');
         div.className = 'lesson-row';
+        
+        // Escape quotes
+        const safeDetails = details.replace(/"/g, '&quot;');
+        const contentClass = details.trim() ? 'has-content' : '';
+        const checkClass = completed ? 'active' : '';
+
         div.innerHTML = `
             <input type="text" placeholder="Lesson Name" class="inp-lesson-name" value="${name}" required>
             <input type="date" class="inp-lesson-date" value="${date}">
-            <button type="button" class="btn-remove-lesson" onclick="this.parentElement.remove()">&times;</button>
+            
+            <input type="hidden" class="inp-lesson-details" value="${safeDetails}">
+            <input type="hidden" class="inp-lesson-completed" value="${completed}">
+            
+            <button type="button" class="btn-icon-action done-check ${checkClass}" onclick="window.toggleLessonStatus(this)" title="Mark as Taught/Done">
+                <i class="fas fa-check"></i>
+            </button>
+            <button type="button" class="btn-icon-action ${contentClass}" onclick="window.openScriptModal(this)" title="Edit Script/Steps">
+                <i class="far fa-file-alt"></i>
+            </button>
+            <button type="button" class="btn-icon-action delete" onclick="this.parentElement.remove()" title="Remove Lesson">
+                <i class="fas fa-times"></i>
+            </button>
         `;
         container.appendChild(div);
     }
+
+    window.toggleLessonStatus = function(btn) {
+        const input = btn.parentElement.querySelector('.inp-lesson-completed');
+        const isDone = input.value === "true";
+        input.value = !isDone;
+        
+        if(!isDone) btn.classList.add('active');
+        else btn.classList.remove('active');
+    };
+
+    window.openScriptModal = function(btn) {
+        currentScriptTarget = btn.parentElement.querySelector('.inp-lesson-details');
+        document.getElementById('inp-lesson-details').value = currentScriptTarget.value;
+        document.getElementById('script-modal').classList.add('active');
+    };
+
+    window.closeScriptModal = function() {
+        document.getElementById('script-modal').classList.remove('active');
+        currentScriptTarget = null;
+    };
+
+    window.saveScript = function() {
+        if(currentScriptTarget) {
+            const text = document.getElementById('inp-lesson-details').value;
+            currentScriptTarget.value = text;
+            const btn = currentScriptTarget.parentElement.querySelector('.btn-icon-action[title="Edit Script/Steps"]');
+            if(text.trim().length > 0) btn.classList.add('has-content');
+            else btn.classList.remove('has-content');
+        }
+        window.closeScriptModal();
+    };
 
     window.openModal = function() {
         document.getElementById('plan-modal').classList.add('active');
         document.getElementById('modal-title').innerText = "New Unit & Topic";
         document.querySelector('form').reset();
-        document.getElementById('lessons-container').innerHTML = ''; // Clear lessons
-        window.addLessonRow(); // Add one empty row
+        document.getElementById('lessons-container').innerHTML = ''; 
+        window.addLessonRow(); 
         document.getElementById('inp-id').value = '';
         document.getElementById('btn-save').innerText = "Save Plan";
     };
@@ -509,13 +599,14 @@
 
         const id = document.getElementById('inp-id').value;
         
-        // Collect Lessons
         const lessonRows = document.querySelectorAll('.lesson-row');
         const lessonsData = [];
         lessonRows.forEach(row => {
             const name = row.querySelector('.inp-lesson-name').value;
             const date = row.querySelector('.inp-lesson-date').value;
-            if(name) lessonsData.push({ name, date });
+            const details = row.querySelector('.inp-lesson-details').value;
+            const completed = row.querySelector('.inp-lesson-completed').value === "true";
+            if(name) lessonsData.push({ name, date, details, completed });
         });
 
         const data = {
@@ -552,11 +643,10 @@
         document.getElementById('inp-month').value = item.month || '';
         document.getElementById('inp-status').value = item.status;
 
-        // Populate Lessons
         const container = document.getElementById('lessons-container');
         container.innerHTML = '';
         if (item.lessons && item.lessons.length > 0) {
-            item.lessons.forEach(l => window.addLessonRow(l.name, l.date));
+            item.lessons.forEach(l => window.addLessonRow(l.name, l.date, l.details || '', l.completed || false));
         } else {
             window.addLessonRow();
         }
@@ -572,67 +662,115 @@
         }
     };
 
-    // --- PDF EXPORT ---
+    // --- PDF EXPORT (SPLIT TABLE) ---
     window.downloadPDF = function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // Header
-        doc.setFillColor(52, 73, 94);
-        doc.rect(0, 0, 210, 35, 'F');
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(22);
-        doc.setTextColor(255, 255, 255);
-        doc.text("Gabriel Mendoza", 14, 18);
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "normal");
-        doc.text("Curriculum Planner & Schedule", 14, 26);
-        
-        const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        doc.setFontSize(10);
-        doc.text(dateStr, 196, 18, { align: 'right' });
-
-        const sortedPlans = [...plans].sort((a,b) => (a.month || '') > (b.month || '') ? 1 : -1);
-
-        const tableBody = sortedPlans.map(item => {
-            // Format Lesson List for PDF
-            let lessonText = "No lessons scheduled.";
-            if(item.lessons && item.lessons.length > 0) {
-                lessonText = item.lessons.map(l => {
-                    let d = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : 'No Date';
-                    return `[${d}] ${l.name}`;
-                }).join("\n");
-            }
+        // Helper to draw header on current page
+        const drawHeader = (subtitle) => {
+            // Updated to Bright Purple Header
+            doc.setFillColor(157, 80, 187); 
+            doc.rect(0, 0, 210, 35, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(255, 255, 255);
+            doc.text("Gabriel Mendoza", 14, 18);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text(subtitle, 14, 26);
             
-            let m = item.month ? new Date(item.month + "-01").toLocaleDateString(undefined, {month:'long', year:'numeric'}) : 'Flexible';
+            const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            doc.setFontSize(10);
+            doc.text(dateStr, 196, 18, { align: 'right' });
+        };
 
-            return [
-                `${item.subject}\n(${m})`,
-                `${item.unit}\n> ${item.topic || ''}`,
-                lessonText,
-                item.strategy || '',
-                item.status
-            ];
-        });
+        // --- PAGE 1: CURRICULUM TAUGHT (DONE) ---
+        drawHeader("Curriculum Report: Taught (Completed)");
 
-        doc.autoTable({
-            startY: 40,
-            head: [['Subject / Month', 'Unit & Topic', 'Scheduled Lessons', 'Strategy', 'Status']],
-            body: tableBody,
-            theme: 'grid',
-            headStyles: { fillColor: [52, 73, 94], textColor: 255, fontStyle: 'bold' },
-            styles: { font: 'helvetica', fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
-            columnStyles: {
-                0: { cellWidth: 25, fontStyle: 'bold' },
-                1: { cellWidth: 40, fontStyle: 'bold', textColor: [50,50,50] },
-                2: { cellWidth: 55, fontSize: 8 },
-                3: { cellWidth: 45, fontStyle: 'italic', textColor: [80,80,80] },
-                4: { cellWidth: 20 }
-            },
-            alternateRowStyles: { fillColor: [248, 249, 250] }
-        });
+        const taughtUnits = plans.filter(p => p.status === 'Done');
+        
+        doc.setFontSize(14);
+        doc.setTextColor(46, 204, 113); // Green for Taught
+        doc.text("PART 1: CURRICULUM TAUGHT", 14, 45);
+        
+        if (taughtUnits.length > 0) {
+            const tableBodyTaught = [];
+            taughtUnits.forEach(item => {
+                let m = item.month ? new Date(item.month + "-01").toLocaleDateString(undefined, {month:'long', year:'numeric'}) : 'Flexible';
+                tableBodyTaught.push([
+                    { content: `${item.subject}\n(${m})`, styles: { fontStyle: 'bold' } },
+                    { content: `${item.unit}\n> ${item.topic || ''}`, styles: { fontStyle: 'bold' } },
+                    item.strategy || '',
+                    'Completed'
+                ]);
+                if(item.lessons && item.lessons.length > 0) {
+                    item.lessons.forEach(l => {
+                        let d = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : '-';
+                        tableBodyTaught.push([{ content: '', styles: { cellPadding: 0 } }, { content: `   [✔] ${l.name} (${d})`, colSpan: 3, styles: { textColor: [100,100,100], fontSize: 8 } }]);
+                    });
+                }
+            });
 
-        doc.save(`Gabriel_Curriculum_${new Date().toISOString().slice(0,10)}.pdf`);
+            doc.autoTable({
+                startY: 48,
+                head: [['Subject / Month', 'Unit & Topic', 'Strategy', 'Status']],
+                body: tableBodyTaught,
+                theme: 'grid',
+                headStyles: { fillColor: [46, 204, 113], textColor: 255, fontStyle: 'bold' },
+                columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 60 }, 2: { cellWidth: 70 }, 3: { cellWidth: 30 } }
+            });
+        } else {
+             doc.setFontSize(10);
+             doc.setTextColor(150);
+             doc.text("No units marked as completed yet.", 14, 55);
+        }
+
+        // --- NEW PAGE: CURRICULUM PLAN (FUTURE/ACTIVE) ---
+        doc.addPage();
+        drawHeader("Curriculum Report: Active & Future Plan");
+
+        const plannedUnits = plans.filter(p => p.status !== 'Done');
+        
+        doc.setFontSize(14);
+        doc.setTextColor(52, 152, 219); // Blue for Plan
+        doc.text("PART 2: ACTIVE & FUTURE PLAN", 14, 45);
+
+        if (plannedUnits.length > 0) {
+            const tableBodyPlan = [];
+            plannedUnits.forEach(item => {
+                let m = item.month ? new Date(item.month + "-01").toLocaleDateString(undefined, {month:'long', year:'numeric'}) : 'Flexible';
+                tableBodyPlan.push([
+                    { content: `${item.subject}\n(${m})`, styles: { fontStyle: 'bold' } },
+                    { content: `${item.unit}\n> ${item.topic || ''}`, styles: { fontStyle: 'bold' } },
+                    item.strategy || '',
+                    item.status
+                ]);
+                if(item.lessons && item.lessons.length > 0) {
+                    item.lessons.forEach(l => {
+                        let d = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : '-';
+                        let checkMark = l.completed ? '[✔]' : '[ ]'; 
+                        let details = l.details ? `\n   Script: ${l.details}` : '';
+                        tableBodyPlan.push([{ content: '', styles: { cellPadding: 0 } }, { content: `   ${checkMark} ${l.name} (${d})${details}`, colSpan: 3, styles: { textColor: [80, 80, 80], fontSize: 8 } }]);
+                    });
+                }
+            });
+
+            doc.autoTable({
+                startY: 48,
+                head: [['Subject / Month', 'Unit & Topic', 'Strategy', 'Status']],
+                body: tableBodyPlan,
+                theme: 'grid',
+                headStyles: { fillColor: [52, 73, 94], textColor: 255, fontStyle: 'bold' },
+                columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 60 }, 2: { cellWidth: 70 }, 3: { cellWidth: 30 } }
+            });
+        } else {
+             doc.setFontSize(10);
+             doc.setTextColor(150);
+             doc.text("No active curriculum plans found.", 14, 55);
+        }
+
+        doc.save(`Gabriel_Curriculum_Split_${new Date().toISOString().slice(0,10)}.pdf`);
     };
 </script>
 
