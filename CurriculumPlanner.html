@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel's Curriculum Planner</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: transparent;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-main: #2c3e50;
+            --text-light: #7f8c8d;
+            
+            /* Pastel Palette */
+            --math-color: #FF6B6B;
+            --science-color: #4ECDC4;
+            --english-color: #45B7D1;
+            --history-color: #FFE66D;
+            --art-color: #FFA500;
+            --music-color: #9D50BB;
+            
+            --radius: 20px;
+            --shadow: 0 10px 20px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 950px;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            border: 4px solid #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #app-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--math-color), var(--science-color), var(--english-color), var(--history-color), var(--art-color), var(--music-color));
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.2rem;
+            margin: 0;
+            color: #333;
+            letter-spacing: 0.5px;
+        }
+
+        h1 span {
+            background: linear-gradient(45deg, #FF6B6B, #9D50BB);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-actions { display: flex; gap: 12px; }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(50,50,93,0.11);
+        }
+
+        .btn-add { background: linear-gradient(135deg, #6e8efb, #a777e3); color: white; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(50,50,93,0.1); }
+        .btn-pdf { background: white; color: #333; border: 2px solid #eee; }
+        .btn-pdf:hover { border-color: #333; background: #333; color: white; }
+
+        /* Filter Bar */
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
+        }
+        .filter-container::-webkit-scrollbar { display: none; }
+
+        .filter-pill {
+            background: #f8f9fa;
+            border: 2px solid #eee;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        .filter-pill:hover { transform: translateY(-2px); }
+        .filter-pill.active { color: white; border-color: transparent; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .filter-pill[data-subject="All"].active { background: #333; }
+        .filter-pill[data-subject="Math"].active { background: var(--math-color); }
+        .filter-pill[data-subject="Science"].active { background: var(--science-color); }
+        .filter-pill[data-subject="English"].active { background: var(--english-color); }
+        .filter-pill[data-subject="History"].active { background: var(--history-color); color: #5a5e00; }
+        .filter-pill[data-subject="Art"].active { background: var(--art-color); }
+        .filter-pill[data-subject="Music"].active { background: var(--music-color); }
+
+        /* Grid Layout */
+        .curriculum-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding-bottom: 20px;
+        }
+
+        /* Unit Card */
+        .unit-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .unit-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .subject-tag {
+            font-size: 0.75rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;
+            padding: 4px 10px; border-radius: 12px; color: white; display: inline-block;
+        }
+
+        .card-actions { opacity: 0.6; transition: 0.2s; }
+        .unit-card:hover .card-actions { opacity: 1; }
+        .icon-btn { cursor: pointer; color: #95a5a6; margin-left: 8px; font-size: 1rem; }
+        .icon-btn:hover { color: #e74c3c; }
+        .icon-btn.edit:hover { color: #3498db; }
+
+        .unit-label { font-size: 0.75rem; color: #999; font-weight: 700; text-transform: uppercase; margin-bottom: 2px;}
+        .unit-title { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; color: var(--text-main); margin: 0 0 5px 0; line-height: 1.2; }
+        .topic-title { font-size: 1.1rem; color: #555; font-weight: 700; margin: 0 0 10px 0; }
+
+        .strategy-box {
+            background: #fdf6e3; border-left: 3px solid #f1c40f; padding: 10px; border-radius: 0 8px 8px 0; margin-bottom: 15px;
+        }
+        .strategy-title { font-size: 0.75rem; font-weight: 800; color: #d35400; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .strategy-text { font-size: 0.85rem; color: #555; font-style: italic; }
+
+        /* Lessons List in Card */
+        .lessons-preview { margin-top: auto; border-top: 1px solid #eee; padding-top: 10px; }
+        .lessons-preview h5 { margin: 0 0 8px 0; font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .lesson-item-preview {
+            display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #444; padding: 4px 8px; background: #f9f9f9; border-radius: 6px;
+        }
+        .lesson-date-badge { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: #666; margin-right: 8px; }
+
+        .card-footer {
+            margin-top: 15px; padding-top: 10px; border-top: 1px solid #f5f5f5;
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #999; font-weight: 600;
+        }
+
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px;}
+        .status-Idea { background: #bdc3c7; }
+        .status-Ready { background: #3498db; }
+        .status-Progress { background: #e67e22; }
+        .status-Done { background: #2ecc71; }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(5px); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        
+        .modal-card {
+            background: white; width: 95%; max-width: 600px; border-radius: var(--radius); padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto; border: 1px solid #eee;
+        }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 700; color: #555; font-size: 0.9rem; }
+        
+        input, select, textarea {
+            width: 100%; padding: 10px 15px; border: 2px solid #eef2f7; border-radius: 10px;
+            font-family: 'Nunito', sans-serif; font-size: 0.95rem; transition: 0.2s; background: #fcfcfc;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #a777e3; background: white; }
+        
+        /* Dynamic Lesson Rows */
+        .lesson-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+        .lesson-row input { flex: 1; }
+        .lesson-row input[type="date"] { width: 140px; flex: none; }
+        .btn-remove-lesson { color: #ff6b6b; background: none; border: none; cursor: pointer; font-size: 1.2rem; }
+        .btn-add-lesson { background: #eef2f7; color: #555; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
+        .btn-add-lesson:hover { background: #dfe4ea; }
+
+        .btn-submit { width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem; margin-top: 15px; }
+        .btn-submit:hover { background: black; }
+
+        #loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 500; display: flex; justify-content: center; align-items: center; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--music-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .curriculum-grid { grid-template-columns: 1fr; }
+            .lesson-row { flex-wrap: wrap; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+            .lesson-row input[type="date"] { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="loading-overlay"><div class="spinner"></div></div>
+
+    <header>
+        <div>
+            <h1><span>Gabriel's</span> Curriculum</h1>
+            <div style="font-size: 0.9rem; color: #888; font-weight: 600;">Planner & Strategy Board</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-add" onclick="window.openModal()">
+                <i class="fas fa-plus"></i> Add Unit
+            </button>
+            <button class="btn btn-pdf" onclick="window.downloadPDF()">
+                <i class="fas fa-file-pdf"></i> Report
+            </button>
+        </div>
+    </header>
+
+    <div class="filter-container">
+        <div class="filter-pill active" data-subject="All" onclick="window.filterBy('All', this)">All Subjects</div>
+        <div class="filter-pill" data-subject="Math" onclick="window.filterBy('Math', this)">Math</div>
+        <div class="filter-pill" data-subject="Science" onclick="window.filterBy('Science', this)">Science</div>
+        <div class="filter-pill" data-subject="English" onclick="window.filterBy('English', this)">English</div>
+        <div class="filter-pill" data-subject="History" onclick="window.filterBy('History', this)">History</div>
+        <div class="filter-pill" data-subject="Art" onclick="window.filterBy('Art', this)">Art</div>
+        <div class="filter-pill" data-subject="Music" onclick="window.filterBy('Music', this)">Music</div>
+    </div>
+
+    <div class="curriculum-grid" id="grid-content"></div>
+</div>
+
+<!-- Modal -->
+<div id="plan-modal" class="modal">
+    <div class="modal-card">
+        <button onclick="window.closeModal()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #aaa;">&times;</button>
+        <h2 id="modal-title">New Unit & Topic</h2>
+        
+        <form onsubmit="window.saveUnit(event)">
+            <input type="hidden" id="inp-id">
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select id="inp-subject" required>
+                        <option value="Math">Math</option>
+                        <option value="Science">Science</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                        <option value="Art">Art</option>
+                        <option value="Music">Music</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target Month (Unit)</label>
+                    <input type="month" id="inp-month" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Unit Name</label>
+                <input type="text" id="inp-unit" placeholder="e.g. Geometry" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Topic Name (Subcategory)</label>
+                <input type="text" id="inp-topic" placeholder="e.g. Identifying Triangles" required>
+            </div>
+
+            <div class="form-group">
+                <label style="color: #d35400;"><i class="fas fa-lightbulb"></i> Teaching Strategy</label>
+                <textarea id="inp-strategy" rows="2" placeholder="Specific sensory cues or literal steps..."></textarea>
+            </div>
+
+            <!-- Lessons Section -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                <label style="color: #2c3e50; margin-bottom: 10px;">Individual Lessons (Target Dates)</label>
+                <div id="lessons-container">
+                    <!-- Dynamic Rows go here -->
+                </div>
+                <button type="button" class="btn-add-lesson" onclick="window.addLessonRow()">+ Add Lesson</button>
+            </div>
+
+            <div class="form-group">
+                <label>Overall Status</label>
+                <select id="inp-status">
+                    <option value="Idea">Idea Phase</option>
+                    <option value="Ready">Ready to Teach</option>
+                    <option value="Progress">In Progress</option>
+                    <option value="Done">Completed</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-save">Save Plan</button>
+        </form>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBTeBLQw1q5BYVfN_KWSsxD17I_UPNvpu4",
+        authDomain: "curriculum-planner-73778.firebaseapp.com",
+        projectId: "curriculum-planner-73778",
+        storageBucket: "curriculum-planner-73778.firebasestorage.app",
+        messagingSenderId: "938927665266",
+        appId: "1:938927665266:web:ef26b9ee178770a95bd2eb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const COLLECTION = "curriculum_plans";
+
+    let plans = [];
+    let activeFilter = 'All';
+
+    const subjectColors = {
+        'Math': 'var(--math-color)',
+        'Science': 'var(--science-color)',
+        'English': 'var(--english-color)',
+        'History': 'var(--history-color)',
+        'Art': 'var(--art-color)',
+        'Music': 'var(--music-color)'
+    };
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) { loadData(); } 
+        else { signInAnonymously(auth); }
+    });
+
+    function loadData() {
+        const ref = collection(db, COLLECTION);
+        onSnapshot(ref, (snap) => {
+            plans = [];
+            snap.forEach(doc => { plans.push({ id: doc.id, ...doc.data() }); });
+            document.getElementById('loading-overlay').classList.add('hidden');
+            renderGrid();
+        });
+    }
+
+    window.filterBy = function(subject, el) {
+        activeFilter = subject;
+        document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        renderGrid();
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById('grid-content');
+        grid.innerHTML = '';
+        let displayData = plans;
+        
+        if (activeFilter !== 'All') displayData = plans.filter(p => p.subject === activeFilter);
+        
+        displayData.sort((a, b) => {
+             const statusOrder = { 'Progress': 1, 'Ready': 2, 'Idea': 3, 'Done': 4 };
+             if (statusOrder[a.status] !== statusOrder[b.status]) return statusOrder[a.status] - statusOrder[b.status];
+             return (a.month || '') > (b.month || '') ? 1 : -1;
+        });
+
+        if (displayData.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">No curriculum plans found.</div>`;
+            return;
+        }
+
+        displayData.forEach(item => {
+            const color = subjectColors[item.subject] || '#ccc';
+            let monthStr = item.month ? new Date(item.month + "-01").toLocaleDateString('default', { month: 'short', year: 'numeric' }) : "Flexible";
+            
+            let strategyHtml = item.strategy ? `<div class="strategy-box"><span class="strategy-title">Strategy</span><div class="strategy-text">${item.strategy}</div></div>` : '';
+            
+            // Generate Lesson List HTML
+            let lessonsHtml = '';
+            if (item.lessons && item.lessons.length > 0) {
+                lessonsHtml = `<div class="lessons-preview"><h5>Planned Lessons</h5>`;
+                item.lessons.forEach(l => {
+                    let dateDisplay = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : '-';
+                    lessonsHtml += `
+                        <div class="lesson-item-preview">
+                            <span><span class="lesson-date-badge">${dateDisplay}</span> ${l.name}</span>
+                        </div>`;
+                });
+                lessonsHtml += `</div>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'unit-card';
+            card.style.borderTop = `5px solid ${color}`;
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="subject-tag" style="background:${color}">${item.subject}</span>
+                    <div class="card-actions">
+                        <i class="fas fa-pen icon-btn edit" onclick="window.editUnit('${item.id}')"></i>
+                        <i class="fas fa-trash icon-btn" onclick="window.deleteUnit('${item.id}')"></i>
+                    </div>
+                </div>
+                
+                <div class="unit-label">Unit</div>
+                <h3 class="unit-title">${item.unit}</h3>
+                <div class="unit-label">Topic</div>
+                <div class="topic-title">${item.topic || item.unit}</div>
+                
+                ${strategyHtml}
+                ${lessonsHtml}
+                
+                <div class="card-footer">
+                    <div><span class="status-dot status-${item.status}"></span>${item.status}</div>
+                    <div><i class="far fa-calendar"></i> ${monthStr}</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // --- MODAL FUNCTIONS ---
+    window.addLessonRow = function(name = '', date = '') {
+        const container = document.getElementById('lessons-container');
+        const div = document.createElement('div');
+        div.className = 'lesson-row';
+        div.innerHTML = `
+            <input type="text" placeholder="Lesson Name" class="inp-lesson-name" value="${name}" required>
+            <input type="date" class="inp-lesson-date" value="${date}">
+            <button type="button" class="btn-remove-lesson" onclick="this.parentElement.remove()">&times;</button>
+        `;
+        container.appendChild(div);
+    }
+
+    window.openModal = function() {
+        document.getElementById('plan-modal').classList.add('active');
+        document.getElementById('modal-title').innerText = "New Unit & Topic";
+        document.querySelector('form').reset();
+        document.getElementById('lessons-container').innerHTML = ''; // Clear lessons
+        window.addLessonRow(); // Add one empty row
+        document.getElementById('inp-id').value = '';
+        document.getElementById('btn-save').innerText = "Save Plan";
+    };
+
+    window.closeModal = function() { document.getElementById('plan-modal').classList.remove('active'); };
+
+    window.saveUnit = async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true; btn.innerText = "Saving...";
+
+        const id = document.getElementById('inp-id').value;
+        
+        // Collect Lessons
+        const lessonRows = document.querySelectorAll('.lesson-row');
+        const lessonsData = [];
+        lessonRows.forEach(row => {
+            const name = row.querySelector('.inp-lesson-name').value;
+            const date = row.querySelector('.inp-lesson-date').value;
+            if(name) lessonsData.push({ name, date });
+        });
+
+        const data = {
+            subject: document.getElementById('inp-subject').value,
+            unit: document.getElementById('inp-unit').value,
+            topic: document.getElementById('inp-topic').value,
+            strategy: document.getElementById('inp-strategy').value,
+            month: document.getElementById('inp-month').value,
+            status: document.getElementById('inp-status').value,
+            lessons: lessonsData,
+            updatedAt: Date.now()
+        };
+
+        try {
+            if (id) await updateDoc(doc(db, COLLECTION, id), data);
+            else {
+                data.createdAt = Date.now();
+                await addDoc(collection(db, COLLECTION), data);
+            }
+            window.closeModal();
+        } catch (err) { alert("Error: " + err.message); } 
+        finally { btn.disabled = false; }
+    };
+
+    window.editUnit = function(id) {
+        const item = plans.find(p => p.id === id);
+        if (!item) return;
+
+        document.getElementById('inp-id').value = item.id;
+        document.getElementById('inp-subject').value = item.subject;
+        document.getElementById('inp-unit').value = item.unit;
+        document.getElementById('inp-topic').value = item.topic || '';
+        document.getElementById('inp-strategy').value = item.strategy || '';
+        document.getElementById('inp-month').value = item.month || '';
+        document.getElementById('inp-status').value = item.status;
+
+        // Populate Lessons
+        const container = document.getElementById('lessons-container');
+        container.innerHTML = '';
+        if (item.lessons && item.lessons.length > 0) {
+            item.lessons.forEach(l => window.addLessonRow(l.name, l.date));
+        } else {
+            window.addLessonRow();
+        }
+
+        document.getElementById('modal-title').innerText = "Edit Plan";
+        document.getElementById('btn-save').innerText = "Update Plan";
+        document.getElementById('plan-modal').classList.add('active');
+    };
+
+    window.deleteUnit = async function(id) {
+        if (confirm("Delete this plan?")) {
+            await deleteDoc(doc(db, COLLECTION, id));
+        }
+    };
+
+    // --- PDF EXPORT ---
+    window.downloadPDF = function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Header
+        doc.setFillColor(52, 73, 94);
+        doc.rect(0, 0, 210, 35, 'F');
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.setTextColor(255, 255, 255);
+        doc.text("Gabriel Mendoza", 14, 18);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        doc.text("Curriculum Planner & Schedule", 14, 26);
+        
+        const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        doc.setFontSize(10);
+        doc.text(dateStr, 196, 18, { align: 'right' });
+
+        const sortedPlans = [...plans].sort((a,b) => (a.month || '') > (b.month || '') ? 1 : -1);
+
+        const tableBody = sortedPlans.map(item => {
+            // Format Lesson List for PDF
+            let lessonText = "No lessons scheduled.";
+            if(item.lessons && item.lessons.length > 0) {
+                lessonText = item.lessons.map(l => {
+                    let d = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : 'No Date';
+                    return `[${d}] ${l.name}`;
+                }).join("\n");
+            }
+            
+            let m = item.month ? new Date(item.month + "-01").toLocaleDateString(undefined, {month:'long', year:'numeric'}) : 'Flexible';
+
+            return [
+                `${item.subject}\n(${m})`,
+                `${item.unit}\n> ${item.topic || ''}`,
+                lessonText,
+                item.strategy || '',
+                item.status
+            ];
+        });
+
+        doc.autoTable({
+            startY: 40,
+            head: [['Subject / Month', 'Unit & Topic', 'Scheduled Lessons', 'Strategy', 'Status']],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: { fillColor: [52, 73, 94], textColor: 255, fontStyle: 'bold' },
+            styles: { font: 'helvetica', fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
+            columnStyles: {
+                0: { cellWidth: 25, fontStyle: 'bold' },
+                1: { cellWidth: 40, fontStyle: 'bold', textColor: [50,50,50] },
+                2: { cellWidth: 55, fontSize: 8 },
+                3: { cellWidth: 45, fontStyle: 'italic', textColor: [80,80,80] },
+                4: { cellWidth: 20 }
+            },
+            alternateRowStyles: { fillColor: [248, 249, 250] }
+        });
+
+        doc.save(`Gabriel_Curriculum_${new Date().toISOString().slice(0,10)}.pdf`);
+    };
+</script>
+
+</body>
+</html>
