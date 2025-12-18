@@ -84,8 +84,6 @@
             line-height: 1.2;
         }
 
-        /* Removed specific span styling to make the whole title colorful */
-
         .header-actions { display: flex; gap: 12px; }
 
         /* Buttons */
@@ -443,6 +441,19 @@
         renderGrid();
     }
 
+    function formatDateManual(dateString) {
+        if (!dateString) return '-';
+        // Force split by hyphen to avoid timezone shifts
+        // dateString is typically "YYYY-MM-DD"
+        const parts = dateString.split('-');
+        if (parts.length !== 3) return dateString;
+        
+        // Remove leading zeros for a cleaner look: "2024-09-02" -> "9/2"
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+        return `${m}/${d}`;
+    }
+
     function renderGrid() {
         const grid = document.getElementById('grid-content');
         grid.innerHTML = '';
@@ -463,7 +474,17 @@
 
         displayData.forEach(item => {
             const color = subjectColors[item.subject] || '#ccc';
-            let monthStr = item.month ? new Date(item.month + "-01").toLocaleDateString('default', { month: 'short', year: 'numeric' }) : "Flexible";
+            let monthStr = "Flexible";
+            if (item.month) {
+                // Same manual fix for unit month "YYYY-MM"
+                const parts = item.month.split('-');
+                if(parts.length === 2) {
+                    const year = parseInt(parts[0], 10);
+                    const monthIndex = parseInt(parts[1], 10) - 1;
+                    const d = new Date(year, monthIndex);
+                    monthStr = d.toLocaleDateString('default', { month: 'short', year: 'numeric' });
+                }
+            }
             
             let strategyHtml = item.strategy ? `<div class="strategy-box"><span class="strategy-title">Strategy</span><div class="strategy-text">${item.strategy}</div></div>` : '';
             
@@ -472,7 +493,9 @@
             if (item.lessons && item.lessons.length > 0) {
                 lessonsHtml = `<div class="lessons-preview"><h5>Planned Lessons</h5>`;
                 item.lessons.forEach(l => {
-                    let dateDisplay = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : '-';
+                    // Use Manual Format to avoid off-by-one error
+                    let dateDisplay = formatDateManual(l.date);
+                    
                     let detailsBadge = (l.details && l.details.trim().length > 0) ? `<i class="fas fa-file-alt has-notes-badge visible" title="Has script"></i>` : '';
                     let completedClass = l.completed ? 'done' : '';
                     
@@ -524,7 +547,6 @@
         const div = document.createElement('div');
         div.className = 'lesson-row';
         
-        // Escape quotes
         const safeDetails = details.replace(/"/g, '&quot;');
         const contentClass = details.trim() ? 'has-content' : '';
         const checkClass = completed ? 'active' : '';
@@ -669,7 +691,7 @@
         
         // Helper to draw header on current page
         const drawHeader = (subtitle) => {
-            // Updated to Bright Purple Header
+            // Bright Purple Header
             doc.setFillColor(157, 80, 187); 
             doc.rect(0, 0, 210, 35, 'F');
             doc.setFont("helvetica", "bold");
@@ -706,7 +728,8 @@
                 ]);
                 if(item.lessons && item.lessons.length > 0) {
                     item.lessons.forEach(l => {
-                        let d = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : '-';
+                        // Use format manual for PDF too
+                        let d = formatDateManual(l.date);
                         tableBodyTaught.push([{ content: '', styles: { cellPadding: 0 } }, { content: `   [✔] ${l.name} (${d})`, colSpan: 3, styles: { textColor: [100,100,100], fontSize: 8 } }]);
                     });
                 }
@@ -748,7 +771,7 @@
                 ]);
                 if(item.lessons && item.lessons.length > 0) {
                     item.lessons.forEach(l => {
-                        let d = l.date ? new Date(l.date).toLocaleDateString(undefined, {month:'numeric', day:'numeric'}) : '-';
+                        let d = formatDateManual(l.date);
                         let checkMark = l.completed ? '[✔]' : '[ ]'; 
                         let details = l.details ? `\n   Script: ${l.details}` : '';
                         tableBodyPlan.push([{ content: '', styles: { cellPadding: 0 } }, { content: `   ${checkMark} ${l.name} (${d})${details}`, colSpan: 3, styles: { textColor: [80, 80, 80], fontSize: 8 } }]);
