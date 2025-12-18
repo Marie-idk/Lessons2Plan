@@ -24,8 +24,8 @@
             --art-color: #FFA500;
             --music-color: #9D50BB;
             
-            --radius: 20px;
-            --shadow: 0 10px 20px rgba(0,0,0,0.08);
+            --radius: 16px; /* Slightly smaller radius */
+            --shadow: 0 5px 15px rgba(0,0,0,0.06);
         }
 
         * { box-sizing: border-box; outline: none; }
@@ -35,7 +35,7 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 10px; /* Reduced body padding */
             display: flex;
             justify-content: center;
             min-height: 100vh;
@@ -46,8 +46,8 @@
             max-width: 950px;
             background-color: var(--card-bg);
             border-radius: var(--radius);
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            padding: 20px; /* Reduced container padding */
+            box-shadow: 0 10px 25px rgba(50, 50, 93, 0.1), 0 5px 10px rgba(0, 0, 0, 0.05);
             border: 4px solid #fff;
             position: relative;
             overflow: hidden;
@@ -57,7 +57,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 6px;
+            height: 5px;
             background: linear-gradient(90deg, var(--math-color), var(--science-color), var(--english-color), var(--history-color), var(--art-color), var(--music-color));
         }
 
@@ -66,16 +66,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 20px; /* Reduced margin */
+            padding-bottom: 15px;
             border-bottom: 2px solid #f0f2f5;
         }
 
         h1 {
             font-family: 'Fredoka', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2rem; /* Smaller header font */
             margin: 0;
-            /* Bright Rainbow Gradient */
             background: linear-gradient(45deg, #FF6B6B, #FF9F1C, #4ECDC4, #00C2FF, #9D50BB);
             -webkit-background-clip: text;
             background-clip: text;
@@ -84,36 +83,41 @@
             line-height: 1.2;
         }
 
-        .header-actions { display: flex; gap: 12px; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
 
         /* Buttons */
         .btn {
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px; /* Smaller buttons */
             border-radius: 50px;
             font-family: 'Nunito', sans-serif;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
+            gap: 6px;
+            font-size: 0.85rem;
             transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(50,50,93,0.11);
+            box-shadow: 0 3px 5px rgba(50,50,93,0.1);
         }
 
         .btn-add { background: linear-gradient(135deg, #6e8efb, #a777e3); color: white; }
-        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(50,50,93,0.1); }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 5px 10px rgba(50,50,93,0.15); }
         .btn-pdf { background: white; color: #333; border: 2px solid #eee; }
         .btn-pdf:hover { border-color: #333; background: #333; color: white; }
+        
+        .btn-toggle-all {
+            background: #f8f9fa; color: #7f8c8d; border: 1px solid #eee; padding: 6px 12px; font-size: 0.8rem;
+        }
+        .btn-toggle-all:hover { background: #eef2f7; color: #2c3e50; }
 
         /* Filter Bar */
         .filter-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             overflow-x: auto;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
             scrollbar-width: none;
         }
         .filter-container::-webkit-scrollbar { display: none; }
@@ -121,10 +125,10 @@
         .filter-pill {
             background: #f8f9fa;
             border: 2px solid #eee;
-            padding: 8px 18px;
+            padding: 6px 14px; /* Compact pills */
             border-radius: 20px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             white-space: nowrap;
             cursor: pointer;
             color: var(--text-light);
@@ -141,74 +145,92 @@
         .filter-pill[data-subject="Art"].active { background: var(--art-color); }
         .filter-pill[data-subject="Music"].active { background: var(--music-color); }
 
-        /* Grid Layout */
+        /* Grid Layout - Optimized for 2 columns */
         .curriculum-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
+            /* Smaller min-width to allow side-by-side on typical screens */
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 15px; /* Tighter gap */
             padding-bottom: 20px;
+            justify-content: center; /* Centers if only one column fits */
         }
 
-        /* Unit Card */
+        /* Unit Card - More Compact */
         .unit-card {
             background: white;
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 14px; /* Reduced padding */
             border: 1px solid #f0f0f0;
             box-shadow: var(--shadow);
             transition: all 0.3s;
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 100%;
+            height: auto; 
         }
 
-        .unit-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .unit-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
 
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
         .subject-tag {
-            font-size: 0.75rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;
-            padding: 4px 10px; border-radius: 12px; color: white; display: inline-block;
+            font-size: 0.7rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;
+            padding: 3px 8px; border-radius: 10px; color: white; display: inline-block;
         }
 
-        .card-actions { opacity: 0.6; transition: 0.2s; }
+        .card-actions { opacity: 0.8; transition: 0.2s; display: flex; align-items: center; gap: 2px;}
         .unit-card:hover .card-actions { opacity: 1; }
-        .icon-btn { cursor: pointer; color: #95a5a6; margin-left: 8px; font-size: 1rem; }
-        .icon-btn:hover { color: #e74c3c; }
+        .icon-btn { cursor: pointer; color: #95a5a6; margin-left: 4px; font-size: 0.9rem; padding: 4px; border-radius: 50%; transition: 0.2s; }
+        .icon-btn:hover { background: #f0f0f0; color: #2c3e50; }
         .icon-btn.edit:hover { color: #3498db; }
+        .icon-btn.delete:hover { color: #e74c3c; }
+        .icon-btn.toggle-icon { margin-left: 6px; font-size: 1rem; }
 
-        .unit-label { font-size: 0.75rem; color: #999; font-weight: 700; text-transform: uppercase; margin-bottom: 2px;}
-        .unit-title { font-family: 'Fredoka', sans-serif; font-size: 1.4rem; color: var(--text-main); margin: 0 0 5px 0; line-height: 1.2; }
-        .topic-title { font-size: 1.1rem; color: #555; font-weight: 700; margin: 0 0 10px 0; }
+        .unit-label { font-size: 0.65rem; color: #999; font-weight: 700; text-transform: uppercase; margin-bottom: 1px;}
+        .unit-title { font-family: 'Fredoka', sans-serif; font-size: 1.15rem; color: var(--text-main); margin: 0 0 3px 0; line-height: 1.2; }
+        .topic-title { font-size: 0.95rem; color: #555; font-weight: 700; margin: 0 0 8px 0; }
+
+        .card-content-body {
+            transition: all 0.3s ease;
+            overflow: hidden;
+            max-height: 2000px;
+            opacity: 1;
+        }
+        
+        .card-content-body.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
 
         .strategy-box {
-            background: #fdf6e3; border-left: 3px solid #f1c40f; padding: 10px; border-radius: 0 8px 8px 0; margin-bottom: 15px;
+            background: #fdf6e3; border-left: 3px solid #f1c40f; padding: 8px; border-radius: 0 6px 6px 0; margin-bottom: 10px;
         }
-        .strategy-title { font-size: 0.75rem; font-weight: 800; color: #d35400; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .strategy-text { font-size: 0.85rem; color: #555; font-style: italic; }
+        .strategy-title { font-size: 0.65rem; font-weight: 800; color: #d35400; text-transform: uppercase; margin-bottom: 2px; display: block; }
+        .strategy-text { font-size: 0.8rem; color: #555; font-style: italic; line-height: 1.4; }
 
         /* Lessons List in Card */
-        .lessons-preview { margin-top: auto; border-top: 1px solid #eee; padding-top: 10px; }
-        .lessons-preview h5 { margin: 0 0 8px 0; font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .lessons-preview { margin-top: auto; border-top: 1px solid #eee; padding-top: 8px; }
+        .lessons-preview h5 { margin: 0 0 6px 0; font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
         .lesson-item-preview {
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 6px; color: #444; padding: 4px 8px; background: #f9f9f9; border-radius: 6px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 4px; color: #444; padding: 3px 6px; background: #f9f9f9; border-radius: 6px;
         }
         .lesson-item-preview.done { background: #e8f5e9; color: #2ecc71; text-decoration: line-through; opacity: 0.8; }
-        .lesson-date-badge { background: #eee; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: #666; margin-right: 8px; }
+        .lesson-date-badge { background: #eee; padding: 1px 5px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; color: #666; margin-right: 6px; }
 
         .has-notes-badge { 
-            color: #3498db; margin-left: 5px; font-size: 0.9rem; display: none;
+            color: #3498db; margin-left: 5px; font-size: 0.85rem; display: none;
         }
         .has-notes-badge.visible { display: inline; }
         .check-badge { color: #2ecc71; margin-right: 5px; display: none; }
         .lesson-item-preview.done .check-badge { display: inline; }
 
         .card-footer {
-            margin-top: 15px; padding-top: 10px; border-top: 1px solid #f5f5f5;
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #999; font-weight: 600;
+            margin-top: 10px; padding-top: 8px; border-top: 1px solid #f5f5f5;
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #999; font-weight: 600;
         }
 
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px;}
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px;}
         .status-Idea { background: #bdc3c7; }
         .status-Ready { background: #3498db; }
         .status-Progress { background: #e67e22; }
@@ -224,30 +246,30 @@
         .modal.nested { z-index: 1100; background: rgba(0,0,0,0.3); }
         
         .modal-card {
-            background: white; width: 95%; max-width: 600px; border-radius: var(--radius); padding: 30px;
+            background: white; width: 95%; max-width: 600px; border-radius: var(--radius); padding: 25px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto; border: 1px solid #eee;
         }
         
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 700; color: #555; font-size: 0.9rem; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: 700; color: #555; font-size: 0.85rem; }
         
         input, select, textarea {
-            width: 100%; padding: 10px 15px; border: 2px solid #eef2f7; border-radius: 10px;
+            width: 100%; padding: 8px 12px; border: 2px solid #eef2f7; border-radius: 10px;
             font-family: 'Nunito', sans-serif; font-size: 0.95rem; transition: 0.2s; background: #fcfcfc;
         }
         input:focus, select:focus, textarea:focus { border-color: #a777e3; background: white; }
         
         /* Dynamic Lesson Rows */
         .lesson-row { 
-            display: flex; gap: 8px; margin-bottom: 10px; align-items: center; 
-            background: white; padding: 8px; border-radius: 8px; border: 1px solid #eee;
+            display: flex; gap: 8px; margin-bottom: 8px; align-items: center; 
+            background: white; padding: 6px; border-radius: 8px; border: 1px solid #eee;
         }
-        .lesson-row input { flex: 1; border: none; background: transparent; padding: 5px; }
+        .lesson-row input { flex: 1; border: none; background: transparent; padding: 4px; font-size: 0.9rem; }
         .lesson-row input:focus { box-shadow: none; border-bottom: 2px solid #a777e3; border-radius: 0; }
-        .lesson-row input[type="date"] { width: 130px; flex: none; font-size: 0.85rem; }
+        .lesson-row input[type="date"] { width: 120px; flex: none; font-size: 0.8rem; }
         
         .btn-icon-action { 
-            color: #95a5a6; background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 5px; border-radius: 4px; 
+            color: #95a5a6; background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 4px; 
         }
         .btn-icon-action:hover { background: #f0f0f0; color: #333; }
         .btn-icon-action.has-content { color: #3498db; }
@@ -255,10 +277,10 @@
         .btn-icon-action.done-check { color: #e0e0e0; }
         .btn-icon-action.done-check.active { color: #2ecc71; background: #e8f5e9; }
         
-        .btn-add-lesson { background: #eef2f7; color: #555; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
+        .btn-add-lesson { background: #eef2f7; color: #555; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; font-size: 0.85rem;}
         .btn-add-lesson:hover { background: #dfe4ea; }
 
-        .btn-submit { width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem; margin-top: 15px; }
+        .btn-submit { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.95rem; margin-top: 10px; }
         .btn-submit:hover { background: black; }
 
         #loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 500; display: flex; justify-content: center; align-items: center; }
@@ -281,9 +303,12 @@
     <header>
         <div>
             <h1>Gabriel's Curriculum</h1>
-            <div style="font-size: 0.95rem; color: #555; font-weight: 700; margin-top: 4px;">Planner & Taught Record</div>
+            <div style="font-size: 0.9rem; color: #555; font-weight: 700; margin-top: 4px;">Planner & Taught Record</div>
         </div>
         <div class="header-actions">
+            <button class="btn btn-toggle-all" onclick="window.toggleAllCards()">
+                <i class="fas fa-expand-arrows-alt"></i> Toggle All
+            </button>
             <button class="btn btn-add" onclick="window.openModal()">
                 <i class="fas fa-plus"></i> Add Unit
             </button>
@@ -328,8 +353,8 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Target Month (Unit)</label>
-                    <input type="month" id="inp-month" required>
+                    <label>Target Timeframe</label>
+                    <input type="text" id="inp-month" placeholder="e.g. Sept - Oct" required>
                 </div>
             </div>
 
@@ -344,8 +369,8 @@
             </div>
 
             <div class="form-group">
-                <label style="color: #d35400;"><i class="fas fa-lightbulb"></i> Teaching Strategy (General)</label>
-                <textarea id="inp-strategy" rows="2" placeholder="General sensory cues or accommodations..."></textarea>
+                <label style="color: #d35400;"><i class="fas fa-lightbulb"></i> Overview of the Unit and Goal</label>
+                <textarea id="inp-strategy" rows="2" placeholder="Summary of what will be learned and unit goals..."></textarea>
             </div>
 
             <!-- Lessons Section -->
@@ -408,7 +433,8 @@
 
     let plans = [];
     let activeFilter = 'All';
-    let currentScriptTarget = null; 
+    let currentScriptTarget = null;
+    let allCollapsed = false;
 
     const subjectColors = {
         'Math': 'var(--math-color)',
@@ -443,12 +469,8 @@
 
     function formatDateManual(dateString) {
         if (!dateString) return '-';
-        // Force split by hyphen to avoid timezone shifts
-        // dateString is typically "YYYY-MM-DD"
         const parts = dateString.split('-');
         if (parts.length !== 3) return dateString;
-        
-        // Remove leading zeros for a cleaner look: "2024-09-02" -> "9/2"
         const m = parseInt(parts[1], 10);
         const d = parseInt(parts[2], 10);
         return `${m}/${d}`;
@@ -474,28 +496,15 @@
 
         displayData.forEach(item => {
             const color = subjectColors[item.subject] || '#ccc';
-            let monthStr = "Flexible";
-            if (item.month) {
-                // Same manual fix for unit month "YYYY-MM"
-                const parts = item.month.split('-');
-                if(parts.length === 2) {
-                    const year = parseInt(parts[0], 10);
-                    const monthIndex = parseInt(parts[1], 10) - 1;
-                    const d = new Date(year, monthIndex);
-                    monthStr = d.toLocaleDateString('default', { month: 'short', year: 'numeric' });
-                }
-            }
+            let monthStr = item.month || 'Flexible';
             
-            let strategyHtml = item.strategy ? `<div class="strategy-box"><span class="strategy-title">Strategy</span><div class="strategy-text">${item.strategy}</div></div>` : '';
+            let strategyHtml = item.strategy ? `<div class="strategy-box"><span class="strategy-title">Overview & Goals</span><div class="strategy-text">${item.strategy}</div></div>` : '';
             
-            // Generate Lesson List HTML
             let lessonsHtml = '';
             if (item.lessons && item.lessons.length > 0) {
                 lessonsHtml = `<div class="lessons-preview"><h5>Planned Lessons</h5>`;
                 item.lessons.forEach(l => {
-                    // Use Manual Format to avoid off-by-one error
                     let dateDisplay = formatDateManual(l.date);
-                    
                     let detailsBadge = (l.details && l.details.trim().length > 0) ? `<i class="fas fa-file-alt has-notes-badge visible" title="Has script"></i>` : '';
                     let completedClass = l.completed ? 'done' : '';
                     
@@ -519,25 +528,65 @@
                 <div class="card-header">
                     <span class="subject-tag" style="background:${color}">${item.subject}</span>
                     <div class="card-actions">
-                        <i class="fas fa-pen icon-btn edit" onclick="window.editUnit('${item.id}')"></i>
-                        <i class="fas fa-trash icon-btn" onclick="window.deleteUnit('${item.id}')"></i>
+                        <i class="fas fa-pen icon-btn edit" onclick="window.editUnit('${item.id}')" title="Edit Unit"></i>
+                        <i class="fas fa-trash icon-btn delete" onclick="window.deleteUnit('${item.id}')" title="Delete"></i>
+                        <i class="fas fa-chevron-up icon-btn toggle-icon" onclick="window.toggleCard(this)" title="Collapse/Expand"></i>
                     </div>
                 </div>
                 
-                <div class="unit-label">Unit</div>
                 <h3 class="unit-title">${item.unit}</h3>
-                <div class="unit-label">Topic</div>
-                <div class="topic-title">${item.topic || item.unit}</div>
                 
-                ${strategyHtml}
-                ${lessonsHtml}
-                
-                <div class="card-footer">
-                    <div><span class="status-dot status-${item.status}"></span>${item.status}</div>
-                    <div><i class="far fa-calendar"></i> ${monthStr}</div>
+                <div class="card-content-body">
+                    <div class="unit-label">Topic</div>
+                    <div class="topic-title">${item.topic || item.unit}</div>
+                    
+                    ${strategyHtml}
+                    ${lessonsHtml}
+                    
+                    <div class="card-footer">
+                        <div><span class="status-dot status-${item.status}"></span>${item.status}</div>
+                        <div><i class="far fa-calendar"></i> ${monthStr}</div>
+                    </div>
                 </div>
             `;
             grid.appendChild(card);
+        });
+    }
+
+    // --- CARD TOGGLING ---
+    window.toggleCard = function(btn) {
+        const card = btn.closest('.unit-card');
+        const body = card.querySelector('.card-content-body');
+        
+        if(body.classList.contains('hidden')) {
+            // Expand
+            body.classList.remove('hidden');
+            btn.classList.remove('fa-chevron-down');
+            btn.classList.add('fa-chevron-up');
+        } else {
+            // Collapse
+            body.classList.add('hidden');
+            btn.classList.remove('fa-chevron-up');
+            btn.classList.add('fa-chevron-down');
+        }
+    }
+
+    window.toggleAllCards = function() {
+        allCollapsed = !allCollapsed;
+        const cards = document.querySelectorAll('.unit-card');
+        cards.forEach(card => {
+            const body = card.querySelector('.card-content-body');
+            const btn = card.querySelector('.toggle-icon');
+            
+            if (allCollapsed) {
+                body.classList.add('hidden');
+                btn.classList.remove('fa-chevron-up');
+                btn.classList.add('fa-chevron-down');
+            } else {
+                body.classList.remove('hidden');
+                btn.classList.remove('fa-chevron-down');
+                btn.classList.add('fa-chevron-up');
+            }
         });
     }
 
@@ -719,7 +768,7 @@
         if (taughtUnits.length > 0) {
             const tableBodyTaught = [];
             taughtUnits.forEach(item => {
-                let m = item.month ? new Date(item.month + "-01").toLocaleDateString(undefined, {month:'long', year:'numeric'}) : 'Flexible';
+                let m = item.month || 'Flexible';
                 tableBodyTaught.push([
                     { content: `${item.subject}\n(${m})`, styles: { fontStyle: 'bold' } },
                     { content: `${item.unit}\n> ${item.topic || ''}`, styles: { fontStyle: 'bold' } },
@@ -737,7 +786,7 @@
 
             doc.autoTable({
                 startY: 48,
-                head: [['Subject / Month', 'Unit & Topic', 'Strategy', 'Status']],
+                head: [['Subject / Month', 'Unit & Topic', 'Overview & Goals', 'Status']],
                 body: tableBodyTaught,
                 theme: 'grid',
                 headStyles: { fillColor: [46, 204, 113], textColor: 255, fontStyle: 'bold' },
@@ -762,7 +811,7 @@
         if (plannedUnits.length > 0) {
             const tableBodyPlan = [];
             plannedUnits.forEach(item => {
-                let m = item.month ? new Date(item.month + "-01").toLocaleDateString(undefined, {month:'long', year:'numeric'}) : 'Flexible';
+                let m = item.month || 'Flexible';
                 tableBodyPlan.push([
                     { content: `${item.subject}\n(${m})`, styles: { fontStyle: 'bold' } },
                     { content: `${item.unit}\n> ${item.topic || ''}`, styles: { fontStyle: 'bold' } },
@@ -781,7 +830,7 @@
 
             doc.autoTable({
                 startY: 48,
-                head: [['Subject / Month', 'Unit & Topic', 'Strategy', 'Status']],
+                head: [['Subject / Month', 'Unit & Topic', 'Overview & Goals', 'Status']],
                 body: tableBodyPlan,
                 theme: 'grid',
                 headStyles: { fillColor: [52, 73, 94], textColor: 255, fontStyle: 'bold' },
