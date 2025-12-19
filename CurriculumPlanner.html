@@ -215,7 +215,12 @@
         .lesson-item-preview {
             display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 4px; color: #444; padding: 3px 6px; background: #f9f9f9; border-radius: 6px;
         }
-        .lesson-item-preview.done { background: #e8f5e9; color: #2ecc71; text-decoration: line-through; opacity: 0.8; }
+        .lesson-item-preview.done { 
+            background: #e8f5e9; 
+            color: #2ecc71; 
+            opacity: 1; /* Updated to maintain visibility */
+            /* text-decoration: line-through; REMOVED */
+        }
         .lesson-date-badge { background: #eee; padding: 1px 5px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; color: #666; margin-right: 6px; }
 
         .has-notes-badge { 
