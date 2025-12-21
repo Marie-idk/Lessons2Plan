@@ -572,16 +572,17 @@
             animation: pulse 1.5s infinite;
         }
 
-        /* Updated Grid for Categories */
-        .lesson-grid-inp { grid-template-columns: 150px 140px 2fr 110px 40px; }
+        /** Updated Lesson Log Grid for Categories */
+        .lesson-grid-inp { grid-template-columns: 150px 170px 2.5fr 36px; }
         
         /* UPDATED VOCAB GRID (Simpler now) */
         .vocab-grid-inp { 
             grid-template-columns: 1fr 1fr 36px;
         }
         
-        /* Activity Grid: Date, Type, Link, Name delete */
-        .activity-grid-inp { grid-template-columns: 150px 130px 100px 1fr 36px; }
+        /* Activity Grid: Date, Type, Name (Link moved down), Delete */
+        /* Adjusted grid columns to account for removing Link from top row */
+        .activity-grid-inp { grid-template-columns: 150px 170px 2.5fr 36px; }
 
         @media (max-width: 900px) {
           /* Keep Lesson + Vocab stacked */
@@ -590,10 +591,10 @@
             gap: 8px;
           }
 
-          /* Keep Activity top row in a row */
-          .activity-grid-inp {
-            grid-template-columns: 150px 140px 120px 1fr 36px;
-            gap: 12px;
+          /* Updated activity grid mobile view */
+          .activity-grid-inp, .lesson-grid-inp {
+            grid-template-columns: 150px 140px 2fr 36px; /* Adjusted */
+            gap: 10px;
           }
 
           /* Keep notes full width */
@@ -721,7 +722,7 @@
           cursor: pointer;
           border-radius: 50%; /* Circular like the modal close button */
           font-weight: 800;
-          font-size: 12px;    
+          font-size: 12px;     
           color: #DC2626;
           background: #FECACA;
           border: none;
@@ -1086,7 +1087,7 @@
                 `;
                 
                 const categories = {};
-                const order = ['Literary Analysis', 'Reading', 'Writing', 'Sentence Structure', 'Quiz', 'General'];
+                const order = ['Literary Analysis', 'Vocab. Application ', 'Reading', 'Writing', 'Sentence Structure', 'Quiz', 'General'];
                 
                 realLessons.forEach((l, idx) => {
                     const cat = l.category || 'General';
@@ -1094,7 +1095,7 @@
                     categories[cat].push({ ...l, originalIdx: idx }); 
                 });
 
-                const allCats = [...new Set([...order, ...Object.keys(categories)])];
+                const allCats = [...new Set([...order, ...Object.keys(categories)])]; 
                 let globalCounter = 0; 
 
                 allCats.forEach(catName => {
@@ -1143,16 +1144,16 @@
                 let actGlobalCounter = 0; // Added counter for activity colors
                 
                 allActivities.forEach(a => {
-                     const dateDisplay = formatDate(a.date);
-                     const isCompleted = (a.status === 'Completed');
-                     const statusLabel = isCompleted ? 'COMPLETED' : 'PLANNED';
-                     const statusClass = isCompleted ? 'taught' : 'planned';
+                      const dateDisplay = formatDate(a.date);
+                      const isCompleted = (a.status === 'Completed');
+                      const statusLabel = isCompleted ? 'COMPLETED' : 'PLANNED';
+                      const statusClass = isCompleted ? 'taught' : 'planned';
 
-                     // Apply Rotating Palette Logic here
-                     const actBorderColor = rotatingPalette[actGlobalCounter % rotatingPalette.length];
-                     actGlobalCounter++;
+                      // Apply Rotating Palette Logic here
+                      const actBorderColor = rotatingPalette[actGlobalCounter % rotatingPalette.length];
+                      actGlobalCounter++;
 
-                     activityHtml += `
+                      activityHtml += `
                         <div class="lesson-row" style="border-left: 6px solid ${actBorderColor} !important;">
                             <div class="lesson-header">
                                 <div style="display:flex; gap:16px;">
@@ -1166,7 +1167,7 @@
                             </div>
                             ${a.details ? `<div style="margin-top:8px; font-size:0.9rem; font-style:italic; color:#4338CA;">${a.details}</div>` : ''}
                         </div>
-                     `;
+                      `;
                 });
                 activityHtml += `</div>`;
             }
@@ -1248,8 +1249,8 @@
         let lessonRows = '';
         if(realLessons.length > 0) {
             realLessons.forEach(l => {
-                 const statusIcon = (l.status==='Completed'||l.status==='Taught') ? '✅' : '🗓️';
-                 lessonRows += `
+                  const statusIcon = (l.status==='Completed'||l.status==='Taught') ? '✅' : '🗓️';
+                  lessonRows += `
                     <div class="dash-list-item">
                         <div>
                             <span style="font-size:0.75rem; font-weight:800; color:#A5B4FC; margin-right:8px;">${formatDate(l.date)}</span>
@@ -1349,24 +1350,26 @@
                 <option value="General" ${l.category==='General'?'selected':''}>General</option>
                 <option value="Literary Analysis" ${l.category==='Literary Analysis'?'selected':''}>Literary Analysis</option>
                 <option value="Reading" ${l.category==='Reading'?'selected':''}>Reading</option>
+                <option value="Vocab. Application" ${l.category==='Vocab. Application'?'selected':''}>Vocab. Application</option>
                 <option value="Writing" ${l.category==='Writing'?'selected':''}>Writing</option>
                 <option value="Sentence Structure" ${l.category==='Sentence Structure'?'selected':''}>Sentence Structure</option>
                 <option value="Quiz" ${l.category==='Quiz'?'selected':''}>Quiz</option>
-<input type="text" class="inp-l-name" placeholder="Focus / Topic (e.g. Setting)" value="${l.name || ''}">
-</select>
-            <select class="inp-l-status">
-                <option value="Planned" ${l.status==='Planned'?'selected':''}>Planned</option>
-                <option value="Completed" ${l.status==='Completed'||l.status==='Taught'?'selected':''}>Completed</option>
             </select>
-          <div class="row-delete" onclick="this.parentElement.remove()">✕</div>
-            <textarea class="inp-l-notes" placeholder="Details (e.g. Hatchet Ch 3-5, analysis...)" style="grid-column: 1 / -1; height:60px;">${l.details || ''}</textarea>
+            <input type="text" class="inp-l-name" placeholder="Focus / Topic (e.g. Setting)" value="${l.name || ''}">
+            <div class="row-delete" onclick="this.parentElement.remove()">✕</div>
+            <textarea class="inp-l-notes" placeholder="Details (e.g. Hatchet Ch 3-5, analysis...)" style="grid-column: 1 / -1; height:120px; min-height: 120px ;resize: vertical;">${l.details || ''}</textarea>
             
-            
+            <div class="status-right" style="grid-column: 1 / -1; display:flex; gap:10px; align-items:center;">
+                <select class="inp-l-status" style="max-width: 220px;">
+                    <option value="Planned" ${l.status==='Planned'?'selected':''}>Planned</option>
+                    <option value="Completed" ${l.status==='Completed'||l.status==='Taught'?'selected':''}>Completed</option>
+                </select>
+            </div>
         `;
         document.getElementById('lessons-container').appendChild(div);
     };
 
-   window.addActivityRow = function(a = {}) {
+  window.addActivityRow = function(a = {}) {
   const div = document.createElement('div');
   div.className = 'complex-row activity-grid-inp';
 
@@ -1374,18 +1377,17 @@
   if (a.linkedLesson) lessonOpts += `<option value="${a.linkedLesson}" selected>${a.linkedLesson}</option>`;
 
   div.innerHTML = `
-    <input type="date" class="inp-a-date" value="${a.date || ''}">
+    <input type="date" class="inp-a-date" value="${a.date || ''}"> 
 
     <select class="inp-a-type">
       <option value="" ${!a.type ? 'selected' : ''}></option>
       <option value="General" ${a.type==='General'?'selected':''}>General</option>
       <option value="Literary Analysis" ${a.type==='Literary Analysis'?'selected':''}>Literary Analysis</option>
+      <option value="Vocab. Application" ${a.type==='Vocab. Application'?'selected':''}>Vocab. Application</option>
       <option value="Reading" ${a.type==='Reading'?'selected':''}>Reading</option>
       <option value="Writing" ${a.type==='Writing'?'selected':''}>Writing</option>
       <option value="Sentence Structure" ${a.type==='Sentence Structure'?'selected':''}>Sentence Structure</option>
     </select>
-
-    <select class="inp-a-link lesson-link-dropdown">${lessonOpts}</select>
 
     <input type="text" class="inp-a-name" placeholder="Task Name (e.g. Journal Entry)" value="${a.name || ''}">
 
@@ -1393,7 +1395,8 @@
 
     <textarea class="inp-a-notes" placeholder="Activity Notes..." style="grid-column: 1 / -1; height:100px;">${a.details || ''}</textarea>
 
-    <div class="status-right" style="grid-column: 1 / -1;">
+    <div class="status-right" style="grid-column: 1 / -1; display:flex; gap:10px; align-items:center;">
+      <select class="inp-a-link lesson-link-dropdown" style="max-width: 200px;">${lessonOpts}</select>
       <select class="inp-a-status" style="max-width: 220px;">
         <option value="Planned" ${a.status==='Planned'?'selected':''}>Planned</option>
         <option value="Completed" ${a.status==='Completed'?'selected':''}>Completed</option>
@@ -1668,7 +1671,7 @@
             }
         });
 
-        doc.save(`Gabriel_Curriculum_Report.pdf`);
+        doc.save(`Curriculum_Log.pdf`);
     };
 </script>
 </body>
